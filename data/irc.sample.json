@@ -1,0 +1,7 @@
+{
+  "nick": "",
+  "password": "",
+  "server": "irc.oftc.net",
+  "port": 6697,
+  "ssl": true
+}

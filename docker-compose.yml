@@ -1,0 +1,43 @@
+version: '2'
+services:
+  app:
+    build: ./app
+    container_name: irc-log-server-simple
+    restart: unless-stopped
+    volumes:
+      - "./app:/app"
+      - "./data:/data"
+    environment:
+      - DATA_FOLDER=/data
+      - VIRTUAL_HOST=SUB.YOURDOMAIN.TLD
+      - VIRTUAL_PORT=8000
+      - LETSENCRYPT_HOST=SUB.YOURDOMAIN.TLD
+      - LETSENCRYPT_EMAIL=email@YOURDOMAIN.TLD
+    network_mode: bridge
+
+  nginx-proxy:
+    image: nginxproxy/nginx-proxy
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./data/conf:/etc/nginx/conf.d
+      - ./data/vhost:/etc/nginx/vhost.d
+      - ./data/html:/usr/share/nginx/html
+      - ./data/certs:/etc/nginx/certs:ro
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    network_mode: bridge
+
+  acme-companion:
+    image: nginxproxy/acme-companion
+    container_name: nginx-proxy-acme
+    environment:
+      - DEFAULT_EMAIL=email@YOURDOMAIN.TLD
+    volumes_from:
+      - nginx-proxy
+    volumes:
+      - ./data/certs:/etc/nginx/certs:rw
+      - ./data/acme:/etc/acme.sh
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    network_mode: bridge
