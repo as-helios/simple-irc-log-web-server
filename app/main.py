@@ -126,7 +126,7 @@ async def read_logs(channel: str):
 @app.get("/log-file/{filename}")
 async def read_logs(filename: str):
     try:
-        with open("{}/logs/#{}.log".format(os.getenv("DATA_FOLDER"), filename), "r") as file:
+        with open("{}/logs/{}".format(os.getenv("DATA_FOLDER"), filename), "r") as file:
             content = file.read()
         return PlainTextResponse(content)
     except FileNotFoundError:
