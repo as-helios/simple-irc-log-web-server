@@ -73,14 +73,17 @@ def connect_to_irc():
             event = data.split(' ')[1]
             # ignore self
             if user == irc_settings['nick']: continue
-            # ignor dms
-            if not channel_name.startswith('#'): continue
+            # ignore dms
+            if not channel_name.startswith('#') and event != "NICK": continue
             if event in ("JOIN", "PART", "QUIT"):
                 message = "*** {} {}s {}".format(user, event.strip().lower(), channel_name)
                 log_irc_message(loggers, channel_name, message.strip())
             elif event == "TOPIC":
                 message = data.split("{} {} {} :".format(raw_sender, event, channel_name))[1].strip()
                 message = "*** {} sets the channels topic to \"{}\"".format(user, message)
+                log_irc_message(loggers, channel_name, message.strip())
+            elif event == "NICK":
+                message = "*** {} changed their nick to  \"{}\"".format(user, data.split(' :')[-1])
                 log_irc_message(loggers, channel_name, message.strip())
             elif event == "PRIVMSG":
                 user = raw_sender.split('!', 1)[0][1:]
