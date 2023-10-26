@@ -71,11 +71,9 @@ def connect_to_irc():
             while True:
                 print(data := irc.recv(1024).decode("UTF-8").strip())
                 if "\n" in data:
-                    for d in data.split("\n"):
-                        if check_retcode(d, '353'):
-                            names.append(d)
+                    [names.append(d.split("\r\n")[0].strip()) for d in data.split("\n") if check_retcode(d, '353')]
                 elif check_retcode(data, '353'):
-                    names.append(data)
+                    names.append(data.split("\r\n")[0].strip())
                 if c in data and "End of /NAMES" in data:
                     break
             if names:
@@ -95,6 +93,7 @@ def connect_to_irc():
                 continue
             user = raw_sender.split('!', 1)[0][1:]
             channel_name = channel_name.lstrip(':').strip()
+            channel_name = channel_name.split("\r\n")[0].strip()
             event = data.split(' ')[1]
             # ignore self
             if user == irc_settings['nick']: continue
