@@ -139,6 +139,8 @@ async def root():
 
 
 def irc_pre_flight_check():
+    if not os.path.exists(logs_folder := "{}/logs".format(os.getenv("DATA_FOLDER"))):
+        os.makedirs(logs_folder)
     settings = read_json_file("{}/irc.json".format(os.getenv("DATA_FOLDER")))
     if not settings['server']:
         print("No IRC server set")
