@@ -29,6 +29,13 @@ def read_json_file(file_path):
         return False
 
 
+def check_retcode(line, retcode):
+    if ' ' in line and line.split(' ')[1] == retcode:
+        return line
+    else:
+        return False
+
+
 def set_channel_logger(channel_name, level=logging.INFO):
     log_file = "{}/logs/{}.log".format(os.getenv("DATA_FOLDER"), channel_name)
     handler = TimedRotatingFileHandler(log_file, when="midnight", interval=1, utc=True)
@@ -60,6 +67,23 @@ def connect_to_irc():
         for c in irc_settings['channels']:
             irc.send(bytes("JOIN {}\r\n".format(c), "UTF-8"))
             channels[c] = []
+            names = []
+            while True:
+                print(data := irc.recv(1024).decode("UTF-8").strip())
+                if "\n" in data:
+                    for d in data.split("\n"):
+                        if check_retcode(d, '353'):
+                            names.append(d)
+                elif check_retcode(data, '353'):
+                    names.append(data)
+                if c in data and "End of /NAMES" in data:
+                    break
+            if names:
+                for line in names:
+                    channels[c] = [nick.strip() for nick in line.split("{} :".format(c))[1].split(' ')]
+            else:
+                print("Could not get names for channel {}: {}".format(c, names))
+        print("Active Channels: ", channels)
         while True:
             print(data := irc.recv(2048).decode("UTF-8"))
             raw_sender = data.split(' ')[0]
