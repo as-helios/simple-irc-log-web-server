@@ -46,7 +46,7 @@ async def irc_thread():
 
 
 def connect_to_irc():
-    loggers = {}
+    channels, loggers = {}, {}
     while True:
         irc_settings = irc_pre_flight_check()
         irc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -59,6 +59,7 @@ def connect_to_irc():
             irc.send(bytes("NICKSERV IDENTIFY {0}\r\n".format(irc_settings['password']), "UTF-8"))
         for c in irc_settings['channels']:
             irc.send(bytes("JOIN {}\r\n".format(c), "UTF-8"))
+            channels[c] = []
         while True:
             print(data := irc.recv(2048).decode("UTF-8"))
             raw_sender = data.split(' ')[0]
@@ -74,10 +75,30 @@ def connect_to_irc():
             # ignore self
             if user == irc_settings['nick']: continue
             # ignore dms
-            if not channel_name.startswith('#') and event != "NICK": continue
-            if event in ("JOIN", "PART", "QUIT"):
+            if not channel_name.startswith('#') and event not in ("NICK", "QUIT"): continue
+            if event == "JOIN":
+                channels[channel_name].append(user)
                 message = "*** {} {}s {}".format(user, event.strip().lower(), channel_name)
                 log_irc_message(loggers, channel_name, message.strip())
+            elif event in ("PART", "QUIT"):
+                match event:
+                    case 'PART':
+                        try:
+                            channels[channel_name].remove(user)
+                        except ValueError:
+                            continue
+                        else:
+                            message = "*** {} {}s {}".format(user, event.strip().lower(), channel_name)
+                            log_irc_message(loggers, channel_name, message.strip())
+                    case 'QUIT':
+                        for c in channels.keys():
+                            try:
+                                channels[c].remove(user)
+                            except ValueError:
+                                continue
+                            else:
+                                message = "*** {} {}s {}".format(user, event.strip().lower(), c)
+                                log_irc_message(loggers, c, message.strip())
             elif event == "TOPIC":
                 message = data.split("{} {} {} :".format(raw_sender, event, channel_name))[1].strip()
                 message = "*** {} sets the channels topic to \"{}\"".format(user, message)
