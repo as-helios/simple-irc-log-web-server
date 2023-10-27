@@ -12,6 +12,7 @@ from logging.handlers import TimedRotatingFileHandler
 import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI
+from starlette.requests import Request
 from starlette.responses import PlainTextResponse
 
 load_dotenv()
@@ -161,9 +162,12 @@ async def shutdown_event():
 
 
 @app.get("/log/{channel}")
-async def read_logs(channel: str):
+async def read_logs(request: Request):
+    filepath = "{}/logs/#{}.log".format(os.getenv("DATA_FOLDER"), request.path_params['channel'])
+    if 'date' in request.query_params.keys():
+        filepath += ".{}".format(request.query_params['date'])
     try:
-        with open("{}/logs/#{}.log".format(os.getenv("DATA_FOLDER"), channel), "r") as file:
+        with open(filepath, "r") as file:
             content = file.read()
         return PlainTextResponse(content)
     except FileNotFoundError:
