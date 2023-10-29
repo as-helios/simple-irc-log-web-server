@@ -186,7 +186,7 @@ async def read_logs(filename: str):
 
 @app.get("/")
 async def root():
-    PlainTextResponse("Hello world!")
+    return PlainTextResponse("Hello world!")
 
 
 def irc_pre_flight_check():
