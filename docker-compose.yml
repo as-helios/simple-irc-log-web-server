@@ -2,7 +2,7 @@ version: '2'
 services:
   app:
     build: ./app
-    container_name: simple-irc-log-server
+    container_name: simple-irc-log-web-server
     restart: unless-stopped
     volumes:
       - "./app:/app"
