@@ -13,7 +13,7 @@ Quick and dirty IRC logging app with daily rotating logs and a web server.
   - Cloud Compute
   - Intel Regular Performance
   - Pick a location
-  - Choose $5 tier with Debian 12
+  - Choose $5 tier with Debian 11
 - Go back to Cloudflare and create an (A) DNS record
 - Type `@` for Name, enter your server's IP address under IPv4
 - Save the DNS record
