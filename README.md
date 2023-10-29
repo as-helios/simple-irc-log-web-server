@@ -39,6 +39,7 @@ apt install -y apt-transport-https ca-certificates curl gnupg2 software-properti
 curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
 add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
 apt update && apt install -y docker-ce
+service docker start
 
 # docker-compose
 curl -L "https://github.com/docker/compose/releases/download/v2.23.0/docker-compose-linux-x86_64" -o /usr/local/bin/docker-compose
