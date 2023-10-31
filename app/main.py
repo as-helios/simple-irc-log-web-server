@@ -104,26 +104,31 @@ def connect_to_irc():
                 channels[channel_name].append(user)
                 message = "*** {} {}s {}".format(user, event.strip().lower(), channel_name)
                 log_irc_message(loggers, channel_name, message.strip())
-            elif event in ("PART", "QUIT"):
-                reason = data.split(':')[-1].strip()
-                match event:
-                    case 'PART':
-                        try:
-                            channels[channel_name].remove(user)
-                        except ValueError:
-                            continue
-                        else:
-                            message = "*** {} {}s {} ({})".format(user, event.strip().lower(), channel_name, reason)
-                            log_irc_message(loggers, channel_name, message.strip())
-                    case 'QUIT':
-                        for c in channels.keys():
-                            try:
-                                channels[c].remove(user)
-                            except ValueError:
-                                continue
-                            else:
-                                message = "*** {} {}s {} ({})".format(user, event.strip().lower(), c, reason)
-                                log_irc_message(loggers, c, message.strip())
+            elif event == "PART":
+                try:
+                    channels[channel_name].remove(user)
+                except ValueError:
+                    continue
+                else:
+                    message = "*** {} {}s {} ({})".format(user, event.strip().lower(), channel_name, reason)
+                    log_irc_message(loggers, channel_name, message.strip())
+            elif event == "QUIT":
+                for c in channels.keys():
+                    try:
+                        channels[c].remove(user)
+                    except ValueError:
+                        continue
+                    else:
+                        message = "*** {} {}s {} ({})".format(user, event.strip().lower(), c, reason)
+                        log_irc_message(loggers, c, message.strip())
+            elif event == "KICK":
+                try:
+                    channels[target[-2]].remove(target[-1])
+                except ValueError:
+                    continue
+                else:
+                    message = "*** {} {}ed {} ({})".format(user, event.strip().lower(), target[-1], reason)
+                    log_irc_message(loggers, target[-2], message.strip())
             elif event == "TOPIC":
                 message = data.split("{} {} {} :".format(raw_sender, event, channel_name))[1].strip()
                 message = "*** {} sets the channels topic to \"{}\"".format(user, message)
