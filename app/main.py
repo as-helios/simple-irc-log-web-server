@@ -130,7 +130,7 @@ def connect_to_irc():
                 except ValueError:
                     continue
                 else:
-                    message = "*** {} kicked {} ({})".format(user, event.strip().lower(), target[-1], reason)
+                    message = "*** {} kicked {} ({})".format(user, target[-1], reason)
                     log_irc_message(loggers, target[-2], message.strip())
             elif event == "TOPIC":
                 message = data.split("{} {} {} :".format(raw_sender, event, channel_name))[1].strip()
