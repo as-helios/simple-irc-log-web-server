@@ -105,6 +105,7 @@ def connect_to_irc():
                 message = "*** {} {}s {}".format(user, event.strip().lower(), channel_name)
                 log_irc_message(loggers, channel_name, message.strip())
             elif event in ("PART", "QUIT"):
+                reason = data.split(':')[-1].strip()
                 match event:
                     case 'PART':
                         try:
@@ -112,7 +113,7 @@ def connect_to_irc():
                         except ValueError:
                             continue
                         else:
-                            message = "*** {} {}s {}".format(user, event.strip().lower(), channel_name)
+                            message = "*** {} {}s {} ({})".format(user, event.strip().lower(), channel_name, reason)
                             log_irc_message(loggers, channel_name, message.strip())
                     case 'QUIT':
                         for c in channels.keys():
@@ -121,7 +122,7 @@ def connect_to_irc():
                             except ValueError:
                                 continue
                             else:
-                                message = "*** {} {}s {}".format(user, event.strip().lower(), c)
+                                message = "*** {} {}s {} ({})".format(user, event.strip().lower(), c, reason)
                                 log_irc_message(loggers, c, message.strip())
             elif event == "TOPIC":
                 message = data.split("{} {} {} :".format(raw_sender, event, channel_name))[1].strip()
