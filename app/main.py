@@ -105,7 +105,7 @@ def connect_to_irc():
             if not channel_name.startswith('#') and event not in ("NICK", "QUIT"): continue
             if event == "JOIN":
                 channels[channel_name].append(user)
-                message = "*** {} joins".format(user)
+                message = "*** {} joined".format(user)
                 log_irc_message(loggers, channel_name, message.strip())
             elif event == "PART":
                 try:
@@ -113,7 +113,7 @@ def connect_to_irc():
                 except ValueError:
                     continue
                 else:
-                    message = "*** {} parts ({})".format(user, reason)
+                    message = "*** {} parted ({})".format(user, reason)
                     log_irc_message(loggers, channel_name, message.strip())
             elif event == "QUIT":
                 for c in channels.keys():
