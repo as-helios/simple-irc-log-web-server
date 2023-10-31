@@ -96,6 +96,9 @@ def connect_to_irc():
             channel_name = channel_name.lstrip(':').strip()
             channel_name = channel_name.split("\r\n")[0].strip()
             event = data.split(' ')[1]
+            details = data.split(':')
+            reason = details[-1].strip()
+            target = details[-2].strip().split(' ')
             # ignore self
             if user == irc_settings['nick']: continue
             # ignore dms
