@@ -92,9 +92,10 @@ def connect_to_irc():
                 channel_name = data.split(' ')[2]
             except IndexError:
                 continue
+            else:
+                channel_name = channel_name.lstrip(':').strip()
+                channel_name = channel_name.split("\r\n")[0].strip()
             user = raw_sender.split('!', 1)[0][1:]
-            channel_name = channel_name.lstrip(':').strip()
-            channel_name = channel_name.split("\r\n")[0].strip()
             event = data.split(' ')[1]
             details = data.split(':')
             reason = details[-1].strip()
